@@ -1,14 +1,16 @@
-import React from "react";
-import { TouchableOpacity, StyleSheet, View } from "react-native";
+import React, { memo } from "react";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import { TileType } from "../../game/constants";
 
 interface TileProps {
-  type: TileType;
+  type: TileType | null;
   onPress: () => void;
+  isSelected?: boolean;
 }
 
-export default function Tile({ type, onPress }: TileProps) {
-  const getTileColor = (tileType: TileType) => {
+const Tile = memo(({ type, onPress, isSelected }: TileProps) => {
+  const getTileColor = (tileType: TileType | null) => {
+    if (!tileType) return "transparent";
     switch (tileType) {
       case "red": return "#FF4444";
       case "green": return "#44FF44";
@@ -21,18 +23,30 @@ export default function Tile({ type, onPress }: TileProps) {
 
   return (
     <TouchableOpacity
-      style={[styles.tile, { backgroundColor: getTileColor(type) }]}
+      activeOpacity={0.7}
+      style={[
+        styles.tile, 
+        { backgroundColor: getTileColor(type) },
+        isSelected && styles.selected
+      ]}
       onPress={onPress}
+      disabled={!type}
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   tile: {
-    width: "12.5%", // 100 / 8
+    width: "12.5%",
     aspectRatio: 1,
     borderWidth: 1,
     borderColor: "#222",
     borderRadius: 4,
   },
+  selected: {
+    borderColor: "#FFF",
+    borderWidth: 3,
+  }
 });
+
+export default Tile;
